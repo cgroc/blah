@@ -1,0 +1,27 @@
+*.class
+*.log
+.DS_Store
+
+# sbt specific
+sbt
+.sbt-local
+.cache
+.history
+.lib
+dist
+target
+lib_managed
+src_managed
+.ensime
+.ensime_cache
+coursier.sbt
+
+# IDE specific
+.idea
+*.iml
+
+bin
+
+target
+.bloop
+.metals
