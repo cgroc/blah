@@ -29,7 +29,7 @@ object Main extends IOApp {
     }
 
   def run(args: List[String]): IO[ExitCode] =
-    thing.compile.drain.as(ExitCode.Success)
+    thing.merge(producerStream).compile.drain.as(ExitCode.Success)
   
   val consumerSettings: ConsumerSettings[IO, Option[String], Option[String]] = 
     ConsumerSettings[IO, Option[String], Option[String]]
@@ -43,6 +43,19 @@ object Main extends IOApp {
       .flatMap(_.stream)
       .map { c => //println(c)
         val r = c.record
-        println(s"${r.key}, ${r.value}")
+        println(s"Received message! === ${r.value.getOrElse("")} ===")
       }
+
+  val producerSettings: ProducerSettings[IO, Option[String], Option[String]] =
+    ProducerSettings[IO, Option[String], Option[String]]
+      .withBootstrapServers("localhost:9092")
+
+  def producerStream = Stream.repeatEval {
+    IO {
+      println("Enter message:\n")
+      val message = scala.io.StdIn.readLine()
+      ProducerRecords.one(ProducerRecord("test", None, Some(message)))
+    }
+  }.through(produce(producerSettings))
+  
 }
